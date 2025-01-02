@@ -2,15 +2,12 @@
 {%  load static %}
 {%  block content %}
      <div class="d-flex gap-3 align-items-center">
-            <h1>New Questions</h1>
-            <a href="{% url 'hot' %}">Hot Questions</a>
+            <h1>One question page</h1>
+            <a href="{% url 'index' %}">Main page</a>
      </div>
             <div class="col-9" >
-                {% for question in questions %}
-                {%  include 'layouts/question.html' %}
-                {% endfor %}
-                
-                {% include 'layouts/pagination.html' %}
+            
+                {%  include 'layouts/question.html' with question=item %}
             </div>
             <div class="col">
                 <section class="mb-3">

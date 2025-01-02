@@ -1,36 +1,45 @@
+import copy
+
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
-from . import models
 
+QUESTIONS = [
+    {
+        'title': f'Title {i}',
+        'id': i,
+        'text': f'This is the text for question {i}'
+    }for i in range(30)
+]
 
-def index(request):
-    context = {'questions': models.QUESTIONS, 'is_auth': True}
-    return render(request, 'index.html', context=context)
+# Create your views here.
+def index (request):
+    page_obj, question = paginate(request, QUESTIONS, per_page=5)
+    return render(
+        request, 'index.html',
+        context={'questions': question, 'page_obj': page_obj}
+    )
 
+def hot(request):
+    hot_questions = QUESTIONS[::-1]
+    page_obj, questions = paginate(request, hot_questions, per_page=5)
+    return render(
+        request, 'hot.html',
+        context={'questions': questions, 'page_obj': page_obj}
+    )
+def question(request, question_id):
+    one_question = QUESTIONS[question_id]
+    return render(
+        request, 'one_question.html',
+        context={'item': one_question})
 
-def question(request, question_id: int):
-    question_item = models.QUESTIONS[question_id]
-    context = {'answers': models.ANSWERS, 'question': question_item}
-    return render(request, 'question.html', context=context)
-
-
-def askq(request):
-    return render(request, 'askq.html')
-
-
-def register(request):
-    return render(request, 'register.html')
-
-
-def registration(request):
-    return render(request, 'registration.html')
-
-
-def settings(request):
-    return render(request, 'settings.html')
-
-
-def tags(request, tags_id: int):
-    tags_item = models.TAGS[tags_id]
-    context = {'tags': tags_item}
-    return render(request, 'tags.html', context=context)
+def paginate(request, queryset, per_page=5):
+    page_num = request.GET.get('page', 1)
+    paginator = Paginator(queryset, per_page)
+    try:
+        page_obj = paginator.page(page_num)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return page_obj, page_obj.object_list
