@@ -5,7 +5,7 @@
             <h1>Hot Questions</h1>
             <a href="{% url 'index' %}">New Questions</a>
      </div>
-            <div class="col-9" >
+    <div class="col-9" >
                 {% for question in questions %}
                 {%  include 'layouts/question.html' %}
                 {% endfor %}
@@ -16,25 +16,18 @@
                 <section class="mb-3">
                     <h2>Popular Tags</h2>
                     <div>
-                        <span class="badge rounded-pill text-bg-primary">Perl</span>
-                        <span class="badge rounded-pill text-bg-secondary">Python</span>
-                        <span class="badge rounded-pill text-bg-success">TechnoPark</span>
-                        <span class="badge rounded-pill text-bg-danger">MySQL</span>
-                        <span class="badge rounded-pill text-bg-warning">django</span>
-                        <span class="badge rounded-pill text-bg-info">Mail.Ru</span>
-                        <span class="badge rounded-pill text-bg-light">Voloshin</span>
-                        <span class="badge rounded-pill text-bg-dark">Firefox</span>
+                        {% for tag in tags %}
+                        <span class="badge rounded-pill text-bg-dark">{{ tag.name }}</span>
+                        {% endfor %}
                     </div>
                 </section>
                 <section>
                     <h2>Best members</h2>
                     <div>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item"><a href="#">Mr.Freeman</a></li>
-                            <li class="list-group-item"><a href="#">Dr.House</a></li>
-                            <li class="list-group-item"><a href="#">Bender</a></li>
-                            <li class="list-group-item"><a href="#">Queen Victoria</a></li>
-                            <li class="list-group-item"><a href="#">V.Pupkin</a></li>
+                            {% for member in best_members %}
+                            <li class="list-group-item"><a href="#">{{ member.name }}</a></li>
+                            {% endfor %}
                           </ul>
                     </div>
                 </section>
