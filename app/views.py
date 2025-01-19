@@ -2,9 +2,12 @@ import copy
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 
+from app.forms import LoginForm, UserForm
 from app.models import Tag, Post, Author
+from django.contrib import auth
 
 QUESTIONS = [
     {
@@ -64,3 +67,29 @@ def paginate(request, queryset, per_page=5):
     except EmptyPage:
         page_obj = paginator.page(paginator.num_pages)
     return page_obj, page_obj.object_list
+
+def login (request):
+    form = LoginForm()
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = auth.authenticate(request, username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            if user:
+                auth.login(request, user)
+                return  redirect('index')
+            form.add_error('password', 'Invalid username or password.')
+    return render(request, 'Login.html', context={'form': form})
+
+def logout(request):
+    auth.logout(request)
+    return redirect(reverse('index'))
+
+def registration (request):
+    form = UserForm()
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    return render(request, 'registrationpage.html', context={'form': form})
+

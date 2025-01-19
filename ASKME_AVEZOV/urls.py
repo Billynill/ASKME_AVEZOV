@@ -25,6 +25,10 @@ urlpatterns = [
     path('hot/', views.hot, name='hot'),
     path('question/<int:question_id>', views.question, name='one_question'),
     path('admin/', admin.site.urls),
+    path('logout/', views.logout, name='logout'),
+    path('login/', views.login, name='login'),
+    path('registration/', views.registration, name='registrationpage'),
+
 ]
 
 def custom_404(request, exception):
