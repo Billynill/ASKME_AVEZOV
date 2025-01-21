@@ -1,0 +1,38 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+{% block content %}
+ <div class="row justify-content-center">
+     <div class="col-md-8">
+         <h2 class="text-center mb-4">Add a New Question</h2>
+         <form method="POST" action="{% url 'add_question' %}" enctype="multipart/form-data">
+             {% csrf_token %}
+             
+             <div class="mb-3">
+                 <label for="title" class="form-label">Question Title</label>
+                 <input type="text" id="title" name="title" class="form-control" required>
+             </div>
+             
+             <div class="mb-3">
+                 <label for="content" class="form-label">Your Question</label>
+                 <textarea id="content" name="content" class="form-control" rows="5" required></textarea>
+             </div>
+             
+             <div class="mb-3">
+                <label for="tags" class="form-label">Tags (comma separated)</label>
+                <input type="text" id="tags" name="tags" class="form-control" value="{{ form.tags.values }}">
+             </div>
+
+             
+             <div class="mb-3">
+                 <label for="image" class="form-label">Upload Image</label>
+                 <input type="file" id="image" name="image" class="form-control">
+             </div>
+             
+             <div class="text-center mt-4">
+                 <button type="submit" class="btn btn-primary">Submit Question</button>
+             </div>
+         </form>
+     </div>
+ </div>
+{% endblock %}

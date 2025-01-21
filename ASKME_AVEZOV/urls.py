@@ -15,10 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import handler404
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import render
 from django.urls import path
 
+from ASKME_AVEZOV import settings
 from app import views
 urlpatterns = [
     path('', views.index, name='index'),
@@ -28,8 +30,12 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('login/', views.login, name='login'),
     path('registration/', views.registration, name='registrationpage'),
+    path('add-question/',  views.add_question, name='add_question'),
+    path('<int:post_id>', views.like_dislike, name='like_dislike'),
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 def custom_404(request, exception):
     return  render(request, '404.html', status=404)

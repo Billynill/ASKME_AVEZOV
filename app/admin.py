@@ -5,4 +5,5 @@ admin.site.register(models.Post)
 admin.site.register(models.Author)
 admin.site.register(models.PostInstance)
 admin.site.register(models.Tag)
+admin.site.register(models.Profile)
 

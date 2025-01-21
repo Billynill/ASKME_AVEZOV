@@ -12,7 +12,7 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
             <div class="d-flex w-100 justify-content-between align-items-center">
-                <a class="navbar-brand" href="#">AskPupkin</a>
+                <a class="navbar-brand" href="{% url 'index' %}">AskPupkin</a>
                 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
@@ -23,13 +23,14 @@
                 <form class="d-flex" role="search">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">
-                        <a href="http://127.0.0.1:3000/templates/Askpage.html#">ASK!</a>
+                        <a href="{% url 'add_question' %}">ASK!</a>
                     </button>
                 </form>
             
                 <div class="d-flex gap-1">
                    {% if user.is_authenticated %}
-                       <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'img/default-avatar.jpg' %}{% endif %}" alt="Avatar" class="img-thumbnail">
+                       <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'img/default-avatar.jpg' %}{% endif %}" alt="Avatar" class="img-thumbnail" style="width: 70px; height: 70px; object-fit: cover; border-radius: 50%;">
+
                        <div>
                            <div>{{ user.username }}</div>
                            <a href="#">Settings</a>

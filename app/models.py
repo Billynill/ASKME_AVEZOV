@@ -1,3 +1,5 @@
+from tkinter import Image
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -14,6 +16,7 @@ class PostManager(models.Manager):
         return post
 
 class Author(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=True)
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -72,22 +75,36 @@ class Answer(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
 
 class Rating(models.Model):
-    user = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     value = models.PositiveSmallIntegerField(choices=[(i, i) for i in range(1, 6)])
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'post')
+        unique_together = ('author', 'post')
 
     def __str__(self):
-        return f"Rating {self.value} by {self.user} for {self.post}"
+        return f"Rating {self.value} by {self.author} for {self.post}"
+
+
+class Registr(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    password = models.CharField(max_length=255)
+    avatar = models.ImageField(upload_to='avatars/')
+
+    def __str__(self):
+        return self.name
+
+
 
 
 

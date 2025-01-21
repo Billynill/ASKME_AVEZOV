@@ -1,11 +1,12 @@
 import copy
 
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 
-from app.forms import LoginForm, UserForm
+from app.forms import LoginForm, UserForm, QuestionForm, RegistrationForm
 from app.models import Tag, Post, Author
 from django.contrib import auth
 
@@ -19,7 +20,7 @@ QUESTIONS = [
 
 # Create your views here.
 def index (request):
-    posts = Post.objects.select_related('author').all()
+    posts = Post.objects.select_related('author').all().order_by('author_id')
     page_obj, questions = paginate(request, posts, per_page=5)
     tags = Tag.objects.all()[:10]
     best_members = Author.objects.all()[:5]
@@ -85,11 +86,43 @@ def logout(request):
     return redirect(reverse('index'))
 
 def registration (request):
-    form = UserForm()
+    form = RegistrationForm()
     if request.method == 'POST':
-        form = UserForm(request.POST)
+        form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('login')
     return render(request, 'registrationpage.html', context={'form': form})
+
+def add_question(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return HttpResponse('Post saved successfully!')
+        else:
+            print(f"Ошибка здесь{form.errors}")
+    else:
+        form = QuestionForm()
+    return render(request, 'add_question.html', context={'form': form})
+
+@login_required
+def like_dislike(request):
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        action = request.POST.get('action')
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post does not exists'}, status=404)
+
+        if action == 'like':
+            post = Post.objects.add_like(post)
+            return JsonResponse({'new_likes': post.likes})
+        elif action == 'dislike':
+            post = Post.objects.remove_like(post)
+            return JsonResponse({'new_dislikes': post.likes})
+
+        return JsonResponse({'error': 'Invalid action'}, status=400)
+    return JsonResponse({'error': 'Invalid action'}, status=400)
 
