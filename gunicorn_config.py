@@ -1,0 +1,10 @@
+workers = 2
+threads = 2
+timeout = 30
+errorlog  = '/path/to/gunicorn.error.log'
+accesslog = '/path/to/gunicorn.access.log'
+bind = '127.0.0.1:8000'
+loglevel = 'info'
+max_requests = 1000
+graceful_timeout = 120
+preload_app = True

@@ -1,43 +1,35 @@
+<script>
 $(document).ready(function() {
-    $(".like-button").click(function() {
-        var postId = $(this).data("post-id");
-
-        $.ajax({
-            url: "{% url 'like_dislike' %}",
-            type: "POST",
-            data: {
-                post_id: postId,
-                action: 'like',
-                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
-            },
-            success: function(response) {
-
-                $("#like-count-" + postId).val(response.new_likes);
-            },
-            error: function(response) {
-                alert("Error: " + response.responseJSON.error);
-            }
-        });
+    $('.like-button').click(function() {
+        const postId = $(this).data('post-id');
+        updateLikes(postId, 'like');
     });
 
 
-    $(".dislike-button").click(function() {
-        var postId = $(this).data("post-id");
+    $('.dislike-button').click(function() {
+        const postId = $(this).data('post-id');
+        updateLikes(postId, 'dislike');
+    });
 
+
+    function updateLikes(postId, action) {
         $.ajax({
-            url: "{% url 'like_dislike' %}",
-            type: "POST",
+            url: '/update_likes/',
+            method: 'POST',
             data: {
                 post_id: postId,
-                action: 'dislike',
-                csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                action: action,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function(response) {
-                $("#dislike-count-" + postId).val(response.new_dislikes);
+
+                $('#like-count-' + postId).val(response.likes);
+                $('#dislike-count-' + postId).val(response.dislikes);
             },
-            error: function(response) {
-                alert("Error: " + response.responseJSON.error);
+            error: function(xhr, status, error) {
+                console.error('Ошибка при обновлении лайков:', error);
             }
         });
-    });
+    }
 });
+</script>

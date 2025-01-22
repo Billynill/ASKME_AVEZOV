@@ -1,33 +1,69 @@
-{% extends  'layouts/base.html'%}
-{%  load static %}
-{%  block content %}
-     <div class="d-flex gap-3 align-items-center">
-            <h1>One question page</h1>
-            <a href="{% url 'index' %}">Main page</a>
-     </div>
-            <div class="col-9" >
-            
-                {%  include 'layouts/question.html' with question=item %}
-            </div>
-            <div class="col">
-                <section class="mb-3">
-                    <h2>Popular Tags</h2>
-                    <div>
-                        {% for tag in tags %}
-                        <span class="badge rounded-pill text-bg-dark">{{ tag.name }}</span>
-                        {% endfor %}
-                    </div>
-                </section>
-                <section>
-                    <h2>Best members</h2>
-                    <div>
-                        <ul class="list-group list-group-flush">
-                            {% for member in best_members %}
-                            <li class="list-group-item"><a href="#">{{ member.name }}</a></li>
-                            {% endfor %}
-                          </ul>
-                    </div>
-                </section>
-            </div>
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% block content %}
+    <div class="d-flex gap-3 align-items-center">
+        <h1>One question page</h1>
+        <a href="{% url 'index' %}">Main page</a>
+    </div>
+    <div class="col-9">
+        <div class="question-box border border-primary p-3 mb-4">
+            {% include 'layouts/question.html' with question=item %}
         </div>
-{%  endblock %}
+    </div>
+    <div class="col">
+        <section class="mb-3">
+            <h2>Popular Tags</h2>
+            <div>
+                {% for tag in tags %}
+                    <span class="badge rounded-pill text-bg-dark">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        </section>
+        <section>
+            <h2>Best members</h2>
+            <div>
+                <ul class="list-group list-group-flush">
+                    {% for member in best_members %}
+                        <li class="list-group-item"><a href="#">{{ member.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </div>
+    <div class="col-9">
+        <section class="mb-3">
+            <h2>Answers</h2>
+            {% for answer in item.answer_set.all %}
+                <div class="answer">
+                    <p><strong>{{ answer.author.name }}</strong> ({{ answer.created_at|date:"Y-m-d H:i" }}):</p>
+                    <p>{{ answer.text }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Likes: {{ answer.likes }}</span>
+                        <form method="post" action="{% url 'like_answer' answer.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary">Like</button>
+                        </form>
+                    </div>
+                    {% if answer.is_accepted %}
+                        <span class="badge bg-success">Accepted</span>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No answers yet.</p>
+            {% endfor %}
+        </section>
+    </div>
+    <div class="col-9">
+        <section class="mt-4">
+            <h2>To Answer</h2>
+            <form method="post" action="{% url 'add_answer' question_id=item.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="question_content" class="form-label">Answer Content</label>
+                    <textarea class="form-control" id="question_content" name="content" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Answer</button>
+            </form>
+        </section>
+    </div>
+{% endblock %}

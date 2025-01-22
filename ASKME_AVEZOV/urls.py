@@ -31,7 +31,12 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('registration/', views.registration, name='registrationpage'),
     path('add-question/',  views.add_question, name='add_question'),
-    path('<int:post_id>', views.like_dislike, name='like_dislike'),
+    path('update_likes/', views.update_likes, name='update_likes'),
+    path('question/add/', views.add_question, name='add_question'),
+    path('question/<int:question_id>/', views.question, name='one_question'),
+    path('answer/<int:answer_id>/like/', views.like_answer, name='like_answer'),
+    path('question/<int:question_id>/add-answer/', views.add_answer, name='add_answer'),
+    path('profile/edit', views.edit_profile, name='edit_profile'),
 
 ]
 if settings.DEBUG:

@@ -5,10 +5,13 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
-from app.forms import LoginForm, UserForm, QuestionForm, RegistrationForm
-from app.models import Tag, Post, Author
+from app.forms import LoginForm, UserForm, QuestionForm, RegistrationForm, UserUpdateForm, ProfileForm
+from app.models import Tag, Post, Author, Answer, Profile
 from django.contrib import auth
+from django.contrib import messages
+
 
 QUESTIONS = [
     {
@@ -106,23 +109,72 @@ def add_question(request):
         form = QuestionForm()
     return render(request, 'add_question.html', context={'form': form})
 
-@login_required
-def like_dislike(request):
+@csrf_exempt
+def update_likes(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
         action = request.POST.get('action')
-        try:
-            post = Post.objects.get(id=post_id)
-        except Post.DoesNotExist:
-            return JsonResponse({'error': 'Post does not exists'}, status=404)
+        post = get_object_or_404(Post, id=post_id)
 
         if action == 'like':
-            post = Post.objects.add_like(post)
-            return JsonResponse({'new_likes': post.likes})
+            post.likes += 1
         elif action == 'dislike':
-            post = Post.objects.remove_like(post)
-            return JsonResponse({'new_dislikes': post.likes})
+            post.dislikes += 1
 
-        return JsonResponse({'error': 'Invalid action'}, status=400)
-    return JsonResponse({'error': 'Invalid action'}, status=400)
+        post.save()
+
+        return JsonResponse({
+            'likes': post.likes,
+            'dislikes': post.dislikes
+        })
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+def like_answer(request, answer_id):
+    answer = get_object_or_404(Answer, id=answer_id)
+    answer.likes += 1
+    answer.save()
+    return redirect('one_question', question_id=answer.post.id)
+
+def add_answer(request, question_id):
+    post = get_object_or_404(Post, id=question_id)
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        author, created = Author.objects.get_or_create(user=request.user)
+
+        answer = Answer.objects.create(
+            content=content,
+            post=post,
+            author=author
+        )
+        return redirect('one_question', question_id=post.id)
+    return render(request, 'one_question.html', {'question': question})
+
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            print("User form valid:", user_form.cleaned_data)
+            print("Profile form valid:", profile_form.cleaned_data)
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your account has been updated!')
+            return redirect('index')
+        else:
+            print("User form errors:", user_form.errors)
+            print("Profile form errors:", profile_form.errors)
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileForm(instance=request.user.profile)
+
+    return render(request, 'edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
+
+
+
+
 

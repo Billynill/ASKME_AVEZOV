@@ -67,6 +67,7 @@ class RegistrationForm(forms.ModelForm):
         registr.save()
         return registr
 
+
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -75,8 +76,9 @@ class QuestionForm(forms.ModelForm):
     def clean_tags(self):
         tags = self.cleaned_data.get('tags')
         if tags:
+            tags = html.cleaned_data(tags)
             tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()]
-            print(f"Processed tags{tag_list}")
+            print(f"Processed tags: {tag_list}")
             tag_objects = []
             for tag_name in tag_list:
                 if not tag_name:
@@ -91,6 +93,7 @@ class QuestionForm(forms.ModelForm):
 
     def save(self, commit=True):
         post = super().save(commit=False)
+
         if commit:
             post.save()
 
@@ -98,3 +101,12 @@ class QuestionForm(forms.ModelForm):
         post.tags.set(tags)
         return post
 
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['nickname', 'avatar']
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']

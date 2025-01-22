@@ -38,6 +38,7 @@ class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
     likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
     image = models.ImageField(upload_to='posts/')
     content = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -63,10 +64,12 @@ class PostInstance(models.Model):
 class Answer(models.Model):
     text = models.CharField(max_length=255)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    content = models.TextField()
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_accepted = models.BooleanField(default=False)
+    likes = models.IntegerField(default=0)
 
     def __str__(self):
         return f'Answer by {self.author.name} on {self.post.title}'
@@ -75,6 +78,7 @@ class Answer(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=255, blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     def __str__(self):

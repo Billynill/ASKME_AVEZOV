@@ -73,19 +73,20 @@ class Command(BaseCommand):
 
         ratings = []
         for _ in range(ratio * 200):
-            user = random.choice(authors)
+            author = random.choice(authors)
             post = random.choice(posts)
             value = random.randint(1, 5)
 
-            if not Rating.objects.filter(user=user, post=post).exists():
+            if not Rating.objects.filter(author=author, post=post).exists():
                 rating = Rating.objects.create(
-                    user=user,
+                    author=author,
                     post=post,
                     value=value,
                 )
                 ratings.append(rating)
             else:
-                self.stdout.write(self.style.WARNING(f'Rating уже существует для user={user} и post={post}'))
+                self.stdout.write(self.style.WARNING(f'Rating уже существует для author={author} и post={post}'))
+
 
         self.stdout.write(self.style.SUCCESS(f'{len(ratings)} оценок добавлено'))
 
